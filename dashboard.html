@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin Dashboard | FastSewa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admindashboard.css">
+</head>
+
+<body>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="brand">
+            <i class="fas fa-shield-alt"></i>
+            FastSewa<span>Admin</span>
+        </div>
+
+        <div class="admin-panel">
+            <div class="admin-avatar" id="adminAvatar">A</div>
+            <div class="admin-name" id="adminName">Admin User</div>
+            <div class="admin-badge">ADMINISTRATOR</div>
+        </div>
+
+        <nav class="nav-menu">
+            <div class="nav-item active" data-section="dashboard" role="button" tabindex="0">
+                <i class="fas fa-th-large"></i> Dashboard
+            </div>
+            <div class="nav-item" data-section="bookings" role="button" tabindex="0">
+                <i class="fas fa-calendar-check"></i> All Bookings
+            </div>
+            <div class="nav-item" data-section="payments" role="button" tabindex="0">
+                <i class="fas fa-indian-rupee-sign"></i> Payments
+            </div>
+            <div class="nav-item" data-section="contacts" role="button" tabindex="0">
+                <i class="fas fa-envelope-open-text"></i> Enquiries
+            </div>
+            <div class="nav-item" data-section="pricing" role="button" tabindex="0">
+                <i class="fas fa-tags"></i> Pricing
+            </div>
+            <div class="nav-item" data-section="users" role="button" tabindex="0">
+                <i class="fas fa-users"></i> Users
+            </div>
+            <div class="nav-item" data-section="admins" role="button" tabindex="0">
+                <i class="fas fa-user-shield"></i> Admins
+            </div>
+        </nav>
+
+        <div class="logout-btn" data-action="logout" role="button" tabindex="0">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay" data-action="toggle-sidebar"></div>
+
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <i class="fas fa-bars mobile-toggle" data-action="toggle-sidebar" role="button" aria-label="Menu"></i>
+                <div class="header-text">
+                    <div class="header-title">Dashboard Overview</div>
+                    <div class="header-time">
+                        <i class="far fa-clock"></i>
+                        <span id="currentTime"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-light" data-action="refresh" title="Reload data"><i class="fas fa-rotate"></i> Refresh</button>
+            </div>
+        </header>
+
+        <div class="content-scroll">
+
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--info);"><i class="fas fa-users"></i></div>
+                        <div class="stat-content">
+                            <h2 id="totalCustomers">0</h2>
+                            <p>Customers</p>
+                            <small id="totalPartners" class="muted"></small>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--success);"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-content">
+                            <h2 id="totalBookings">0</h2>
+                            <p>Total Bookings</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--warning);"><i class="fas fa-clock"></i></div>
+                        <div class="stat-content">
+                            <h2 id="pendingBookings">0</h2>
+                            <p>Pending Requests</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary);"><i class="fas fa-indian-rupee-sign"></i></div>
+                        <div class="stat-content">
+                            <h2 id="paidRevenue">₹0</h2>
+                            <p>Paid Online</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert-box" id="orphanAlert" hidden>
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <span id="orphanAlertText"></span>
+                    <button class="btn btn-primary" data-section-link="payments">Review payments</button>
+                </div>
+                <div class="alert-box info" id="contactsAlert" hidden>
+                    <i class="fas fa-envelope"></i>
+                    <span id="contactsAlertText"></span>
+                    <button class="btn btn-primary" data-section-link="contacts">Open enquiries</button>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Recent Bookings</h2>
+                        <button class="btn btn-primary" data-section-link="bookings">View All</button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Service</th>
+                                <th>Payment</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentBookingsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- BOOKINGS -->
+            <div id="bookings" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>All Service Bookings</h2>
+                        <div class="filters">
+                            <input type="search" id="bookingSearch" class="filter-input" placeholder="Search name, phone, ID...">
+                            <select id="bookingStatusFilter" class="filter-input">
+                                <option value="">All statuses</option>
+                                <option value="pending">Request Received</option>
+                                <option value="verified">Verified</option>
+                                <option value="assigned">Professional Assigned</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                            <select id="bookingPaymentFilter" class="filter-input">
+                                <option value="">Paid &amp; unpaid</option>
+                                <option value="paid">Paid</option>
+                                <option value="unpaid">Unpaid</option>
+                            </select>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>Customer</th>
+                                <th>Phone</th>
+                                <th>Service</th>
+                                <th>Payment</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allBookingsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PAYMENTS -->
+            <div id="payments" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Online Payments</h2>
+                        <select id="paymentStatusFilter" class="filter-input">
+                            <option value="">All</option>
+                            <option value="paid" selected>Paid</option>
+                            <option value="created">Started (not completed)</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <p class="section-note">
+                        Rows marked <strong>Needs follow-up</strong> are payments that were received but never turned into a
+                        booking (the customer closed the page before submitting the form). Call them using the details shown.
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Plan</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Razorpay Ref</th>
+                                <th>Booking</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paymentsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- CONTACTS -->
+            <div id="contacts" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Contact Enquiries</h2>
+                        <select id="contactStatusFilter" class="filter-input">
+                            <option value="">All</option>
+                            <option value="new">New</option>
+                            <option value="contacted">Contacted</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Contact</th>
+                                <th>Interested In</th>
+                                <th>Message</th>
+                                <th>Source</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allContactsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PRICING -->
+            <div id="pricing" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Service Pricing</h2>
+                        <input type="search" id="pricingFilter" class="filter-input" placeholder="Filter by page or plan name...">
+                    </div>
+                    <p class="section-note">
+                        Changes apply immediately — the live site and payment amounts update on the next page load.
+                        Prices marked <i class="fas fa-circle-info"></i> show their own rate card on the page
+                        (e.g. per-sqft estimates) — the amount below is only what gets charged at booking.
+                    </p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Page</th>
+                                <th>Plan Name</th>
+                                <th>Unit</th>
+                                <th>Price (₹)</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allPricingTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- USERS -->
+            <div id="users" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Users</h2>
+                        <div class="filters">
+                            <select id="userTypeFilter" class="filter-input">
+                                <option value="">All account types</option>
+                                <option value="customer">Customers</option>
+                                <option value="provider">Service Providers</option>
+                                <option value="vendor">Material Vendors</option>
+                            </select>
+                            <button class="btn btn-primary" data-action="open-modal" data-modal="addUserModal">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                        </div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Type</th>
+                                <th>Joined</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ADMINS -->
+            <div id="admins" class="section">
+                <div class="table-container">
+                    <div class="table-header">
+                        <h2>Admin Management</h2>
+                        <button class="btn btn-primary" data-action="open-modal" data-modal="addAdminModal">
+                            <i class="fas fa-user-plus"></i> Add Admin
+                        </button>
+                    </div>
+                    <p class="section-note">For safety, admin accounts can't be removed from this panel. Ask the system owner to remove one directly in the database.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Added On</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Booking details -->
+    <div class="modal" id="bookingModal" role="dialog" aria-modal="true" aria-labelledby="bookingModalTitle">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h2 id="bookingModalTitle">Booking Details</h2>
+                <span class="close-modal" data-action="close-modal" data-modal="bookingModal" role="button" aria-label="Close">&times;</span>
+            </div>
+            <div id="bookingModalBody" class="detail-body"></div>
+        </div>
+    </div>
+
+    <!-- Contact details -->
+    <div class="modal" id="contactModal" role="dialog" aria-modal="true" aria-labelledby="contactModalTitle">
+        <div class="modal-content modal-wide">
+            <div class="modal-header">
+                <h2 id="contactModalTitle">Enquiry</h2>
+                <span class="close-modal" data-action="close-modal" data-modal="contactModal" role="button" aria-label="Close">&times;</span>
+            </div>
+            <div id="contactModalBody" class="detail-body"></div>
+        </div>
+    </div>
+
+    <!-- Add User -->
+    <div class="modal" id="addUserModal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New User</h2>
+                <span class="close-modal" data-action="close-modal" data-modal="addUserModal" role="button" aria-label="Close">&times;</span>
+            </div>
+            <form id="addUserForm">
+                <div class="form-group">
+                    <label for="userFirstName">First Name</label>
+                    <input type="text" class="form-input" id="userFirstName" required maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="userLastName">Last Name</label>
+                    <input type="text" class="form-input" id="userLastName" required maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email</label>
+                    <input type="email" class="form-input" id="userEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPassword">Temporary Password (min 8 characters)</label>
+                    <input type="password" class="form-input" id="userPassword" required minlength="8" autocomplete="new-password">
+                </div>
+                <div class="form-group">
+                    <label for="userPhone">Phone</label>
+                    <input type="tel" class="form-input" id="userPhone">
+                </div>
+                <div class="form-group">
+                    <label for="userTypeSelect">Account Type</label>
+                    <select class="form-input" id="userTypeSelect">
+                        <option value="customer">Customer</option>
+                        <option value="provider">Service Provider</option>
+                        <option value="vendor">Material Vendor</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Add User</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Admin -->
+    <div class="modal" id="addAdminModal" role="dialog" aria-modal="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Admin</h2>
+                <span class="close-modal" data-action="close-modal" data-modal="addAdminModal" role="button" aria-label="Close">&times;</span>
+            </div>
+            <form id="addAdminForm">
+                <div class="form-group">
+                    <label for="adminFirstName">First Name</label>
+                    <input type="text" class="form-input" id="adminFirstName" required maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="adminLastName">Last Name</label>
+                    <input type="text" class="form-input" id="adminLastName" required maxlength="50">
+                </div>
+                <div class="form-group">
+                    <label for="adminEmail">Email</label>
+                    <input type="email" class="form-input" id="adminEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password (min 8 characters)</label>
+                    <input type="password" class="form-input" id="adminPassword" required minlength="8" autocomplete="new-password">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Add Admin</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

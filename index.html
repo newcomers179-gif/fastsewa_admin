@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | FastSewa</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admindashboard.css">
+</head>
+
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-brand">
+                <i class="fas fa-shield-alt"></i>
+                <div>Fast<span>Sewa</span> Admin</div>
+            </div>
+            <p class="login-subtitle">Sign in with your admin account</p>
+
+            <div id="loginError" class="login-error"></div>
+
+            <form id="adminLoginForm">
+                <div class="login-field">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="admin@fastsewa.com" required autocomplete="username">
+                </div>
+                <div class="login-field">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required
+                        autocomplete="current-password">
+                </div>
+                <button type="submit" id="loginBtn" class="login-btn">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Sign In
+                </button>
+            </form>
+
+            <p class="login-footer-note">This panel is for FastSewa administrators only.</p>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="login.js"></script>
+</body>
+
+</html>

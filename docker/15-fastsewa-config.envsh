@@ -1,0 +1,25 @@
+#!/bin/sh
+# Sourced by the official nginx entrypoint BEFORE templates are rendered
+# (".envsh" files run in the entrypoint's own shell, so exports carry over).
+#  - Writes config.js from the API_BASE environment variable (if set).
+#  - Exports CSP_CONNECT_SRC (the API origin) for default.conf.template.
+
+FASTSEWA_HTML_DIR=/usr/share/nginx/html
+
+if [ -n "${API_BASE:-}" ]; then
+    case "$API_BASE" in
+        http://*|https://*) ;;
+        *) echo "[fastsewa-admin] API_BASE must start with http:// or https:// (got: $API_BASE)" >&2; exit 1 ;;
+    esac
+    fastsewa_api=$(printf '%s' "$API_BASE" | sed -e 's#/*$##' -e 's/[\\"]/\\&/g')
+    printf '// Generated at container start from the API_BASE env var.\nconst API_BASE = "%s";\n' "$fastsewa_api" > "$FASTSEWA_HTML_DIR/config.js"
+    echo "[fastsewa-admin] config.js -> API_BASE=$fastsewa_api"
+fi
+
+if [ -z "${CSP_CONNECT_SRC:-}" ]; then
+    fastsewa_url=$(grep -o 'https\{0,1\}://[^"]*' "$FASTSEWA_HTML_DIR/config.js" | head -n 1 || true)
+    CSP_CONNECT_SRC=$(printf '%s' "$fastsewa_url" | sed -E 's#^(https?://[^/]+).*#\1#')
+fi
+export CSP_CONNECT_SRC
+export PORT="${PORT:-8080}"
+echo "[fastsewa-admin] listening on ${PORT}; CSP connect-src: 'self' ${CSP_CONNECT_SRC}"

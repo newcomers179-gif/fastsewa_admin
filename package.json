@@ -1,0 +1,10 @@
+{
+  "name": "fastsewa-admin-dashboard",
+  "version": "2.0.0",
+  "private": true,
+  "description": "FastSewa admin dashboard — static site, deployed separately from the main frontend and backend.",
+  "scripts": {
+    "dev": "npx --yes http-server@14.1.1 . -p 8081 -c-1",
+    "start": "npx --yes http-server@14.1.1 . -p 8081 -c-1"
+  }
+}
